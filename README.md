@@ -103,6 +103,42 @@ use Contenir\PageCache\CacheControl;
 $repo = new InMemoryRepository(CacheControl::enabled());
 ```
 
+## Clearing a site's caches
+
+The CMS asks a site to clear its caches by posting a signed token to the site's fixed endpoint,
+`{audience}/api/cache`, in an `Authorization: Bearer` header. The site clears its caches through
+their own stores, so it never matters which backend holds them or how files lie on disk, and the
+CMS purges the CDN only once the site has answered `204`. The tokens are
+[contenir/contenir-site-token](https://github.com/contenir/contenir-site-token)'s, of type
+`contenir-cache+jwt`: they live a minute and are accepted once. Both sides share the same
+`SiteKeys` as previews.
+
+On the CMS:
+
+```php
+use Contenir\PageCache\Clear\ClearProtocol;
+use Contenir\PageCache\Clear\ClearSigner;
+
+$token = (new ClearSigner($keys, $clock))->sign((string) $editorId);
+// POST ClearProtocol::endpoint($keys->audience) with "Authorization: Bearer {$token}"
+```
+
+On the site (contenir/contenir-page-cache-mezzio's `CacheClearMiddleware` does this):
+
+```php
+use Contenir\PageCache\Clear\ClearVerifier;
+use Contenir\PageCache\Clear\RefusedClear;
+
+try {
+    $clear = (new ClearVerifier($keys, $clock, $replay))->verify($request->getHeaderLine('Authorization'));
+} catch (RefusedClear $refused) {
+    // answer $refused->status with $refused->getMessage()
+}
+```
+
+A refused clear answers `400` for no token or an unknown scope, `401` for one that can't be
+trusted, and `409` for one already used.
+
 ## Development
 
 The QA toolchain is [contenir/contenir-qa-tools](https://github.com/contenir/contenir-qa-tools).
