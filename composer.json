@@ -5,7 +5,9 @@
   "license": "MIT",
   "require": {
     "php": "~8.3.0 || ~8.4.0 || ~8.5.0",
-    "contenir/contenir-config": "^2.1"
+    "contenir/contenir-config": "^2.1",
+    "contenir/contenir-site-token": "^0.1",
+    "psr/clock": "^1.0"
   },
   "require-dev": {
     "contenir/contenir-qa-tools": "0.1.x-dev",

@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- The cache clear protocol: `Clear\ClearProtocol`, `ClearSigner` for the CMS and `ClearVerifier` for
+  a site. The CMS posts a signed `contenir-cache+jwt` token to the site's fixed `/api/cache` in an
+  `Authorization: Bearer` header, so the site clears its own caches through their stores. Requires
+  contenir/contenir-site-token 0.1.
+
 ## [2.0.0-RC1] - 2026-10-07
 
 The first 2.0 pre-release, published as `contenir/contenir-page-cache`. The
